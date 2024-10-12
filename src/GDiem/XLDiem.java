@@ -18,7 +18,7 @@ public class XLDiem {
     }
 
     public static ResultSet getHV() {
-        getCon(); // Ensure connection is established
+        getCon();
         try {
             Statement st = cn.createStatement();
             return st.executeQuery("SELECT * FROM tbHocvien");
@@ -29,7 +29,7 @@ public class XLDiem {
     }
 
     public static boolean insertHV(Hocvien hv) {
-        getCon(); // Ensure connection is established
+        getCon();
         try (PreparedStatement checkStmt = cn.prepareStatement("SELECT COUNT(*) FROM tbHocvien WHERE MaHV = ?")) {
             checkStmt.setString(1, hv.getMaHV());
             try (ResultSet rs = checkStmt.executeQuery()) {

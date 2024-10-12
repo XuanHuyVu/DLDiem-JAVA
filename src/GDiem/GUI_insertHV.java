@@ -1,12 +1,11 @@
-
 package GDiem;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
@@ -14,7 +13,7 @@ import java.sql.*;
 public class GUI_insertHV extends JFrame implements ActionListener, MouseListener {
     private JTextField tfMaHV;
     private JTextField tfHoten;
-    private JTextField tfLop;
+    private JComboBox<String> cbLop;  // Changed to JComboBox
     private JTextField tfDiem;
     private JButton btAdd;
     private JButton btEdit;
@@ -24,16 +23,16 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
     private DefaultTableModel dfModel;
     private JTable tb;
     private int selectedRow = -1;
-    
+
     public GUI_insertHV() {
         setTitle("CHƯƠNG TRÌNH QUẢN LÝ ĐIỂM");
-        setSize(1000,600);
+        setSize(1000, 600);
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         BuildGUI();
     }
-    
+
     private void BuildGUI() {
         JPanel pnLeft = new JPanel(new GridBagLayout());
         pnLeft.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -49,7 +48,7 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
 
         gbc.gridx = 1;
         tfMaHV = new JTextField();
-        tfMaHV.setPreferredSize(new Dimension(300, 30));  // Set kích thước cố định
+        tfMaHV.setPreferredSize(new Dimension(300, 30));
         pnLeft.add(tfMaHV, gbc);
 
         // Họ tên
@@ -60,19 +59,19 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
 
         gbc.gridx = 1;
         tfHoten = new JTextField();
-        tfHoten.setPreferredSize(new Dimension(300, 30));  // Set kích thước cố định
+        tfHoten.setPreferredSize(new Dimension(300, 30));
         pnLeft.add(tfHoten, gbc);
 
-        // Lớp
+        // Lớp (Changed to JComboBox)
         gbc.gridx = 0;
         gbc.gridy = 2;
         JLabel lbLop = new JLabel("Lớp: ");
         pnLeft.add(lbLop, gbc);
 
         gbc.gridx = 1;
-        tfLop = new JTextField();
-        tfLop.setPreferredSize(new Dimension(300, 30));
-        pnLeft.add(tfLop, gbc);
+        cbLop = new JComboBox<>(new String[] {"Class A", "Class B", "Class C"});  // Add options here
+        cbLop.setPreferredSize(new Dimension(300, 30));
+        pnLeft.add(cbLop, gbc);
 
         // Điểm tổng kết
         gbc.gridx = 0;
@@ -111,93 +110,82 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pnLeft, pnRight);
         splitPane.setDividerLocation(400);
-        add(splitPane);     
-        
-        //Bắt sự kiện thêm(không lưu database)
+        add(splitPane);
+
+        // Bắt sự kiện thêm (không lưu database)
         btAdd.addActionListener((var e) -> {
             String maHV = tfMaHV.getText();
             String hoten = tfHoten.getText();
-            String lop = tfLop.getText();
+            String lop = cbLop.getSelectedItem().toString();  // Changed to get from JComboBox
             String diem = tfDiem.getText();
-            
+
             try {
-                float diemStr = Float.parseFloat(diem);  // Parse diem as float
+                //float diemStr = Float.parseFloat(diem);  // Parse diem as float
 
                 dfModel.addRow(new String[]{maHV, hoten, lop, String.valueOf(diem)});
 
                 tfMaHV.setText("");
                 tfHoten.setText("");
-                tfLop.setText("");
+                cbLop.setSelectedIndex(0);  // Reset ComboBox
                 tfDiem.setText("");
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(null, "Điểm tổng kết phải là số thực hợp lệ.", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
             }
         });
-        
-        //Bắt sự kiện sửa
+
+        // Bắt sự kiện sửa
         btEdit.addActionListener((var e) -> {
             if (selectedRow != -1) {
                 dfModel.setValueAt(tfMaHV.getText(), selectedRow, 0);
                 dfModel.setValueAt(tfHoten.getText(), selectedRow, 1);
-                dfModel.setValueAt(tfLop.getText(), selectedRow, 2);
+                dfModel.setValueAt(cbLop.getSelectedItem().toString(), selectedRow, 2);  // Changed to get from JComboBox
                 dfModel.setValueAt(tfDiem.getText(), selectedRow, 3);
 
                 tfMaHV.setText("");
                 tfHoten.setText("");
-                tfLop.setText("");
+                cbLop.setSelectedIndex(0);  // Reset ComboBox
                 tfDiem.setText("");
-                selectedRow = -1;  // Reset lựa chọn sau khi sửa
+                selectedRow = -1;  // Reset selection after editing
             } else {
                 JOptionPane.showMessageDialog(null, "Hãy chọn một dòng để sửa.");
             }
         });
-        
-        //Bắt sự kiện xóa
+
+        // Bắt sự kiện xóa
         btDelete.addActionListener((var e) -> {
             if (selectedRow != -1) {
                 dfModel.removeRow(selectedRow);
                 tfMaHV.setText("");
                 tfHoten.setText("");
-                tfLop.setText("");
+                cbLop.setSelectedIndex(0);  // Reset ComboBox
                 tfDiem.setText("");
-                selectedRow = -1;  // Reset lựa chọn sau khi xóa
+                selectedRow = -1;  // Reset selection after deletion
             } else {
                 JOptionPane.showMessageDialog(null, "Hãy chọn một dòng để xóa.");
             }
         });
-        
-        
-        //Bắt sự kiện tìm kiếm
+
+        // Bắt sự kiện tìm kiếm
         btSearch.addActionListener((var e) -> {
             String searchMaHV = tfMaHV.getText().toLowerCase();
             boolean found = false;
-//            DefaultTableModel tbModel = (DefaultTableModel) tb.getModel();
-//            tbModel.setRowCount(0);
-            
+
             for (int i = 0; i < dfModel.getRowCount(); i++) {
                 String maHV = dfModel.getValueAt(i, 0).toString().toLowerCase();
                 if (maHV.equals(searchMaHV)) {
                     tb.setRowSelectionInterval(i, i);  // Chọn dòng tìm thấy
                     found = true;
                     break;
-
-//                    String hoten = dfModel.getValueAt(i, 1).toString();
-//                    String lop = dfModel.getValueAt(i, 2).toString();
-//                    String diem = dfModel.getValueAt(i, 3).toString();
-//                    dfModel.addRow(new String[]{maHV,hoten,lop,diem});
-//                    found = true;
-//                    break;
                 }
             }
             if (!found) {
                 JOptionPane.showMessageDialog(null, "Không tìm thấy học viên với mã: " + searchMaHV);
             }
         });
-        
-        //Bắt sự kiện lưu
+
+        // Bắt sự kiện lưu
         btSave.addActionListener((var e) -> {
             try {
-                
                 for (int i = 0; i < dfModel.getRowCount(); i++) {
                     String maHV = dfModel.getValueAt(i, 0).toString();
                     String hoten = dfModel.getValueAt(i, 1).toString();
@@ -218,7 +206,6 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
             }
         });
 
-        
         loadData(dfModel);
     }
 
@@ -226,51 +213,51 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
         XLDiem.getCon();
         new GUI_insertHV().setVisible(true);
     }
-    
+
     private void loadData(DefaultTableModel dfModel) {
         try {
             ResultSet res = XLDiem.getHV();
             dfModel.setRowCount(0);
             dfModel.fireTableDataChanged();
-            if(res != null) {
-                while(res.next()) {
-                    dfModel.addRow(new String[] {
-                        res.getString("MaHV"),
-                        res.getString("Hoten"),
-                        res.getString("Lop"),
-                        res.getString("Diem"),
+            if (res != null) {
+                while (res.next()) {
+                    dfModel.addRow(new String[]{
+                            res.getString("MaHV"),
+                            res.getString("Hoten"),
+                            res.getString("Lop"),
+                            res.getString("Diem"),
                     });
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
         }
     }
-    
-   
+
     @Override
     public void mouseClicked(MouseEvent e) {
-        selectedRow = tb.getSelectedRow();
-        if (selectedRow != -1) {
-            tfMaHV.setText(dfModel.getValueAt(selectedRow, 0).toString());
-            tfHoten.setText(dfModel.getValueAt(selectedRow, 1).toString());
-            tfLop.setText(dfModel.getValueAt(selectedRow, 2).toString());
-            tfDiem.setText(dfModel.getValueAt(selectedRow, 3).toString());
+        int rowIndex = tb.getSelectedRow();
+        if (rowIndex != -1) {
+            selectedRow = rowIndex;
+            tfMaHV.setText(dfModel.getValueAt(rowIndex, 0).toString());
+            tfHoten.setText(dfModel.getValueAt(rowIndex, 1).toString());
+            cbLop.setSelectedItem(dfModel.getValueAt(rowIndex, 2).toString());  // Set selected item
+            tfDiem.setText(dfModel.getValueAt(rowIndex, 3).toString());
         }
     }
-    
+
+    // Other MouseListener events
     @Override
-    public void actionPerformed(ActionEvent e) {}
-    
-    @Override
-    public void mousePressed(MouseEvent e) {}
+    public void mousePressed(MouseEvent e) { }
 
     @Override
-    public void mouseReleased(MouseEvent e) {}
+    public void mouseReleased(MouseEvent e) { }
 
     @Override
-    public void mouseEntered(MouseEvent e) {}
+    public void mouseEntered(MouseEvent e) { }
 
     @Override
-    public void mouseExited(MouseEvent e) {}
+    public void mouseExited(MouseEvent e) { }
+
+    @Override
+    public void actionPerformed(ActionEvent e) { }
 }
