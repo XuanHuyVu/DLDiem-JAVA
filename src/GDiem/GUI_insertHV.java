@@ -123,10 +123,8 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
             try {
                 float diemStr = Float.parseFloat(diem);  // Parse diem as float
 
-                // Add data to the table
                 dfModel.addRow(new String[]{maHV, hoten, lop, String.valueOf(diem)});
 
-                // Clear text fields after adding
                 tfMaHV.setText("");
                 tfHoten.setText("");
                 tfLop.setText("");
@@ -153,6 +151,7 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
                 JOptionPane.showMessageDialog(null, "Hãy chọn một dòng để sửa.");
             }
         });
+        
         //Bắt sự kiện xóa
         btDelete.addActionListener((var e) -> {
             if (selectedRow != -1) {
@@ -172,19 +171,28 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
         btSearch.addActionListener((var e) -> {
             String searchMaHV = tfMaHV.getText().toLowerCase();
             boolean found = false;
+//            DefaultTableModel tbModel = (DefaultTableModel) tb.getModel();
+//            tbModel.setRowCount(0);
+            
             for (int i = 0; i < dfModel.getRowCount(); i++) {
                 String maHV = dfModel.getValueAt(i, 0).toString().toLowerCase();
                 if (maHV.equals(searchMaHV)) {
                     tb.setRowSelectionInterval(i, i);  // Chọn dòng tìm thấy
                     found = true;
                     break;
+
+//                    String hoten = dfModel.getValueAt(i, 1).toString();
+//                    String lop = dfModel.getValueAt(i, 2).toString();
+//                    String diem = dfModel.getValueAt(i, 3).toString();
+//                    dfModel.addRow(new String[]{maHV,hoten,lop,diem});
+//                    found = true;
+//                    break;
                 }
             }
             if (!found) {
                 JOptionPane.showMessageDialog(null, "Không tìm thấy học viên với mã: " + searchMaHV);
             }
         });
-        
         
         //Bắt sự kiện lưu
         btSave.addActionListener((var e) -> {
@@ -242,9 +250,8 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
    
     @Override
     public void mouseClicked(MouseEvent e) {
-        selectedRow = tb.getSelectedRow();  // Lấy chỉ số dòng được chọn
+        selectedRow = tb.getSelectedRow();
         if (selectedRow != -1) {
-            // Lấy giá trị từ các cột và điền vào các JTextField tương ứng
             tfMaHV.setText(dfModel.getValueAt(selectedRow, 0).toString());
             tfHoten.setText(dfModel.getValueAt(selectedRow, 1).toString());
             tfLop.setText(dfModel.getValueAt(selectedRow, 2).toString());
