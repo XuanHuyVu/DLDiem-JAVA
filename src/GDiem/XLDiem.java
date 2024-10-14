@@ -34,25 +34,22 @@ public class XLDiem {
             checkStmt.setString(1, hv.getMaHV());
             try (ResultSet rs = checkStmt.executeQuery()) {
                 if (rs.next() && rs.getInt(1) > 0) {
-                    return false; // Duplicate entry found
+                    return false;
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false; // Error checking for duplicates
+            return false;
         }
 
-        // Proceed to insert if no duplicates
         try (PreparedStatement insertStmt = cn.prepareStatement("INSERT INTO tbHocvien (MaHV, Hoten, Lop, Diem) VALUES (?, ?, ?, ?)")) {
             insertStmt.setString(1, hv.getMaHV());
             insertStmt.setString(2, hv.getHoten());
             insertStmt.setString(3, hv.getLop());
             insertStmt.setFloat(4, hv.getDiem());
             insertStmt.executeUpdate();
-            return true; // Insertion successful
+            return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false; // Insertion failed
+            return false;
         }
     }
 }

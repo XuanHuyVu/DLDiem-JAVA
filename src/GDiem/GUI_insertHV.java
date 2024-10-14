@@ -13,7 +13,7 @@ import java.sql.*;
 public class GUI_insertHV extends JFrame implements ActionListener, MouseListener {
     private JTextField tfMaHV;
     private JTextField tfHoten;
-    private JComboBox<String> cbLop;  // Changed to JComboBox
+    private JComboBox<String> cbLop;
     private JTextField tfDiem;
     private JButton btAdd;
     private JButton btEdit;
@@ -40,7 +40,6 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Mã học viên
         gbc.gridx = 0;
         gbc.gridy = 0;
         JLabel lbMaHV = new JLabel("Mã học viên: ");
@@ -62,14 +61,13 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
         tfHoten.setPreferredSize(new Dimension(300, 30));
         pnLeft.add(tfHoten, gbc);
 
-        // Lớp (Changed to JComboBox)
         gbc.gridx = 0;
         gbc.gridy = 2;
         JLabel lbLop = new JLabel("Lớp: ");
         pnLeft.add(lbLop, gbc);
 
         gbc.gridx = 1;
-        cbLop = new JComboBox<>(new String[] {"Class A", "Class B", "Class C"});  // Add options here
+        cbLop = new JComboBox<>(new String[] {"62TH1", "62PM1", "62PM2"});
         cbLop.setPreferredSize(new Dimension(300, 30));
         pnLeft.add(cbLop, gbc);
 
@@ -84,7 +82,6 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
         tfDiem.setPreferredSize(new Dimension(300, 30));
         pnLeft.add(tfDiem, gbc);
 
-        // Các nút
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 2;
@@ -100,6 +97,9 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
         pnLeftBottom.add(btSearch);
         pnLeftBottom.add(btSave);
         pnLeft.add(pnLeftBottom, gbc);
+        
+        JPanel pnLeftContainer  = new JPanel(new BorderLayout());
+        pnLeftContainer.add(pnLeft, BorderLayout.NORTH);
 
         JPanel pnRight = new JPanel(new GridLayout(1, 1));
         String[] headers = {"Mã học viên", "Họ tên", "Lớp", "Điểm"};
@@ -108,7 +108,7 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
         tb.addMouseListener(this);
         pnRight.add(new JScrollPane(tb));
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pnLeft, pnRight);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pnLeftContainer, pnRight);
         splitPane.setDividerLocation(400);
         add(splitPane);
 
@@ -116,7 +116,7 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
         btAdd.addActionListener((var e) -> {
             String maHV = tfMaHV.getText();
             String hoten = tfHoten.getText();
-            String lop = cbLop.getSelectedItem().toString();  // Changed to get from JComboBox
+            String lop = cbLop.getSelectedItem().toString();
             String diem = tfDiem.getText();
 
             try {
@@ -126,7 +126,7 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
 
                 tfMaHV.setText("");
                 tfHoten.setText("");
-                cbLop.setSelectedIndex(0);  // Reset ComboBox
+                cbLop.setSelectedIndex(0);
                 tfDiem.setText("");
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(null, "Điểm tổng kết phải là số thực hợp lệ.", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
@@ -143,9 +143,9 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
 
                 tfMaHV.setText("");
                 tfHoten.setText("");
-                cbLop.setSelectedIndex(0);  // Reset ComboBox
+                cbLop.setSelectedIndex(0);
                 tfDiem.setText("");
-                selectedRow = -1;  // Reset selection after editing
+                selectedRow = -1;
             } else {
                 JOptionPane.showMessageDialog(null, "Hãy chọn một dòng để sửa.");
             }
@@ -157,9 +157,9 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
                 dfModel.removeRow(selectedRow);
                 tfMaHV.setText("");
                 tfHoten.setText("");
-                cbLop.setSelectedIndex(0);  // Reset ComboBox
+                cbLop.setSelectedIndex(0);
                 tfDiem.setText("");
-                selectedRow = -1;  // Reset selection after deletion
+                selectedRow = -1;
             } else {
                 JOptionPane.showMessageDialog(null, "Hãy chọn một dòng để xóa.");
             }
@@ -173,7 +173,7 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
             for (int i = 0; i < dfModel.getRowCount(); i++) {
                 String maHV = dfModel.getValueAt(i, 0).toString().toLowerCase();
                 if (maHV.equals(searchMaHV)) {
-                    tb.setRowSelectionInterval(i, i);  // Chọn dòng tìm thấy
+                    tb.setRowSelectionInterval(i, i);
                     found = true;
                     break;
                 }
@@ -240,7 +240,7 @@ public class GUI_insertHV extends JFrame implements ActionListener, MouseListene
             selectedRow = rowIndex;
             tfMaHV.setText(dfModel.getValueAt(rowIndex, 0).toString());
             tfHoten.setText(dfModel.getValueAt(rowIndex, 1).toString());
-            cbLop.setSelectedItem(dfModel.getValueAt(rowIndex, 2).toString());  // Set selected item
+            cbLop.setSelectedItem(dfModel.getValueAt(rowIndex, 2).toString());
             tfDiem.setText(dfModel.getValueAt(rowIndex, 3).toString());
         }
     }
